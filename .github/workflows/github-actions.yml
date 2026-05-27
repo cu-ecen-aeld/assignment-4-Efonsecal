@@ -12,11 +12,16 @@ jobs:
         timeout-minutes: 240
         steps:
           - uses: actions/checkout@v2
-          - name: Checkout submodules
-            run: git submodule update --init --recursive
+            with:
+              fetch-depth: 0
           - uses: webfactory/ssh-agent@v0.5.3
             with:
-                ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+              ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+          - name: Checkout submodules
+            run: |
+              git config --global url."https://gitlab.com/".insteadOf "git@gitlab.com:"
+              git submodule update --init --recursive
           - name: Run full test
             env:
               GIT_SSH_COMMAND: "ssh -o StrictHostKeyChecking=no"
